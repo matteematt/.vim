@@ -1,5 +1,3 @@
-" Enabling filetype support provides filetype-specific indenting,
-" syntax highlighting, omni-completion and other useful settings.
 filetype plugin indent on
 syntax on
 
@@ -30,7 +28,7 @@ elseif g:os == "Linux"
 endif
 
 " Colour scheme
-" https://github.com/joshdick/onedark.vim README explains setting termguicolors, need extra check for tmux or nvim
+"  README explains setting termguicolors, need extra check for tmux or nvim
 if (has("termguicolors"))
 	set termguicolors
 endif
