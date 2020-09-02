@@ -14,7 +14,7 @@ else
 	let s:javascriptLikeFix = "eslint --fix"
 	let s:fixCmdMappings = {
 				\ "javascript": s:javascriptLikeFix,
-				\ "javascriptreact": s:javascriptLikeFix
+				\ "javascriptreact": s:javascriptLikeFix,
 				\ "json": s:javascriptLikeFix
 				\}
 
@@ -26,12 +26,6 @@ else
 		execute "silent !rm " . g:linterCurrentFile
 		unlet g:linterCurrentFile
 		redraw!
-	endfunction
-
-	function linting#LinterFixErrCallback(channel, message)
-		echo "In the error callback"
-		echo a:channel
-		echo a:message
 	endfunction
 
 	" This is used to autofix lint issues, such as with eslint --fix
@@ -65,14 +59,13 @@ else
 		" TODO: Handle things like errors etc
 		call job_start(s:fixCmdMappings[l:fileType]." ".g:linterCurrentFile, {
 			\"close_cb": "linting#LinterFixSuccessCallback",
-			\"err_cb": "linting#LinterFixErrCallback"
 			\})
 	endfunction
 
 	let s:javascriptLikeErr = "eslint --format unix"
 	let s:errCmdMappings = {
 				\ "javascript": s:javascriptLikeErr,
-				\ "javascriptreact": s:javascriptLikeErr
+				\ "javascriptreact": s:javascriptLikeErr,
 				\ "json": s:javascriptLikeErr
 				\}
 
@@ -128,7 +121,7 @@ else
 	" Map for each filetype and how to initialise the linting
 	let s:initCmdMappings = {
 				\ "javascript": s:javascriptLikeInit,
-				\ "javascriptreact": s:javascriptLikeInit
+				\ "javascriptreact": s:javascriptLikeInit,
 				\ "json": s:javascriptLikeInit
 				\}
 	let s:hasInitFiletype = {}
