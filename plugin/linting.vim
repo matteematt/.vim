@@ -9,12 +9,13 @@
 if !has("job") || version < 800
 	" Non-compatible version of vim
 else
+	" ===== LINTING WRAPPERS =====
 	" TODO: The error stuff does not currently work, so need to manually check if not working
-	" TODO: Check linting program can run first (like eslint might not be able to see an error file)
 	let s:javascriptLikeFix = "eslint --fix"
 	let s:fixCmdMappings = {
 				\ "javascript": s:javascriptLikeFix,
 				\ "javascriptreact": s:javascriptLikeFix
+				\ "json": s:javascriptLikeFix
 				\}
 
 	function linting#LinterFixSuccessCallback(channel)
@@ -48,6 +49,12 @@ else
 			return
 		endif
 
+		if !has_key(s:hasInitFiletype, l:fileType) || s:hasInitFiletype[l:fileType] == 0
+			echo "Linting did not initialise correctly for filetype: " . l:fileType
+			unlet g:linterCurrentFile
+			return
+		endif
+
 		let l:copySignal = system("cp " . expand("%s") . " " . g:linterCurrentFile)
 		if strlen(l:copySignal) != 0
 			echoerr "Error reading file on disk for linting: " . trim(l:copySignal)
@@ -66,10 +73,10 @@ else
 	let s:errCmdMappings = {
 				\ "javascript": s:javascriptLikeErr,
 				\ "javascriptreact": s:javascriptLikeErr
+				\ "json": s:javascriptLikeErr
 				\}
 
-	function linting#LinterErrSuccessCallback(message)
-		echo "Checking file at " . g:linterErrFile
+	function linting#LinterErrSuccessCallback(channel)
 		if filereadable(g:linterErrFile)
 			execute "cfile! " . g:linterErrFile
 		else
@@ -95,6 +102,12 @@ else
 			return
 		endif
 
+		if !has_key(s:hasInitFiletype, l:fileType) || s:hasInitFiletype[l:fileType] == 0
+			echo "Linting did not initialise correctly for filetype: " . l:fileType
+			unlet g:linterErrFile
+			return
+		endif
+
 		" TODO: Handle things like errors etc
 		call job_start(s:errCmdMappings[l:fileType]." ".expand("%s"), {
 			\"close_cb": "linting#LinterErrSuccessCallback",
@@ -107,4 +120,42 @@ else
 	map <leader>lf :call <SID>RunLinterFix()<CR>
 	" lint and show in quickfix
 	map <leader>ll :call <SID>RunLinterErrors()<CR>
+
+	" ===== INIT =====
+	" Don't actually need to init ESLint, but it needs a config file so may fail if that isn't set up
+	let s:javascriptLikeInit = '/bin/sh -c "echo \"console.log();\" | eslint --stdin'
+
+	" Map for each filetype and how to initialise the linting
+	let s:initCmdMappings = {
+				\ "javascript": s:javascriptLikeInit,
+				\ "javascriptreact": s:javascriptLikeInit
+				\ "json": s:javascriptLikeInit
+				\}
+	let s:hasInitFiletype = {}
+
+	function linting#LinterInitCallback(channel)
+		let l:initJob = ch_getjob(a:channel)
+		let l:initJobInfo = job_info(l:initJob)
+		let l:jobExitCode = str2nr(l:initJobInfo["exitval"])
+		if l:jobExitCode != 0
+			echoerr "Error sending up linter using cmd : '" . join(l:initJobInfo["cmd"]) . "'"
+			let s:hasInitFiletype[&filetype] = 0
+		else
+			echo "Linter initialised for filetype: " . &filetype
+			let s:hasInitFiletype[&filetype] = 1
+		endif
+	endfunction
+
+	function s:RunLinterInit()
+		let l:fileType=&filetype
+		if !has_key(s:initCmdMappings, l:fileType) || has_key(s:hasInitFiletype, l:fileType)
+			return
+		endif
+		call job_start(s:initCmdMappings[l:fileType], {"close_cb": "linting#LinterInitCallback"})
+	endfunction
+
+	augroup InitLinter
+		au!
+		autocmd BufReadPost *.js,*.json,*.jsx	call <SID>RunLinterInit()
+	augroup END
 endif
