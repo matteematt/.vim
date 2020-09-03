@@ -5,19 +5,23 @@ function comments#CommentCheckVimscript(checkLine)
 	return (l:matchIndex == -1) ? 0 : 1
 endfunction
 
-function comments#CommentCheckCLike(checkLine)
+function comments#CommentCheckCStyle(checkLine)
 	let l:matchIndex = match(a:checkLine, '^\s*\/\/')
 	return (l:matchIndex == -1) ? 0 : 1
 endfunction
 
 let s:commentCommands = {
 	\"vim": {"cmd": "comments#CommentCheckVimscript", "add":'0I f"2xhx', "del": 'I" '},
-	\"clike": {"cmd": "comments#CommentCheckCLike", "add":'0I f/3xhx', "del": 'I// '}
+	\"cstyle": {"cmd": "comments#CommentCheckCStyle", "add":'0I f/3xhx', "del": 'I// '}
 	\}
 
+" javascriptreact needs to be improved for different types of comments in jsx blocks
 let s:filetypesMap = {
 	\"vim":"vim",
-	\"javascript":"clike",
+	\"javascript":"cstyle",
+	\"javascriptreact":"cstyle",
+	\"scala":"cstyle",
+	\"java":"cstyle",
 	\}
 
 function s:ToggleComments() range
