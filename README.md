@@ -7,17 +7,59 @@ Linux and MacOS.  I am a novice at vimscript so I imagine a lot of my scripts co
 
 ## My Plugins
 
+A description of the vim plugins found in the `plugin/` directory. Keybindings are included, but note there are more
+keybindings that this, such as from the `vimrc` file.
+
 ### Fuzzy File Picker
+
+A fuzzy file picker with a syntax highlighted preview window if all dependencies are installed.
+```
+<leader>o - Open the fuzzy file picker
+```
 
 ### StatusBar
 
+A custom status bar at the bottom. Shows the current mode, filename, and other useful info. If in a git project it shows
+the current branch name, updated every time a buffer is read.
+
 ### GitCommands
 
+A list of functions for working with git projects.
+```
+GitDiffFile(branch_name) - show a vertical split with the changes from the current file and the current file on the
+specified branch. The branch_name defaults to master if not specified
+MergeConflictList() - populate all locations with a merge conflict in the quickfix window
+```
+
 ### Comments Toggle
+
+A simple plugin to toggle a range of lines as commented or uncommented.
+```
+<leader>cc - Toggle the comment status of the selected range of lines
+```
+Supported types of commenting are:
+* C-Style: such as `C`, `C++`, `Java`, `Javscript`
+* Shell-Style: such as `Bash` and `Python`
+* Vim: for `vimscript`
+
+### Linting
+
+I have written an synchronous linter wrapper for some programming languages I use. The script is found at
+`plugin/linting.vim`. Info about the required dependencies can be found further down the readme.
+```
+<leader>ll - Run the linter and errors are shown in the quickfix window
+<leader>lf - Run the linter to automatically fix linting errors and update the buffer
+```
+Currently supported linting is:
+* ESLint for Javscript, JavscriptReact, and Json. Supports Linting errors and automatically fixing of some linting
+		errors
+* Scalastyle for Scala. Only supports linting errors
 
 ### Misc
 
 #### Whitespace stripper
+
+Autocommand which strips whitespace at the end of lines just before a buffer is written to disk.
 
 ## Dependencies
 
@@ -30,7 +72,14 @@ these shell commands are required for the specific linting, but not for anything
 
 ESLint is used for linting Javascript projects. ESLint also has an advantage that it can be used to automatically fix a
 lot of the linting errors itself.  ESLint requires a `.eslintrc` file, which will likely be a reason that the linting
-has not been able to correctly initialise  lkjdsafjdsfjf
+has not been able to correctly initialise.
+
+#### Scalastyle
+
+Scalastyle is used for linting Scala projects. Scalastyle does not support automatically fixing linter errors. As
+scalastyle does not support output vim quickfix format output a shell wrapper is used at `bin/scalalinter.sh` in
+addition to the vimscript linter file. Scalastyle also requires a config file, the location of which on the filesystem
+is also configured in the shell script.
 
 ### Binaries
 
