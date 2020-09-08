@@ -88,6 +88,9 @@ viewed file in the fuzzy file picker if installed. These can all be installed vi
 are currently only used for the file picker, which while wonderful, you could manage without them. However, `rg` is
 instrumental to many of the plugins and many parts of this configuration are likely to not work without it.
 
+`exuberant ctags` is useful to generate `tags` file which vim supports out of the box to jump to definitions. It supports
+many languages, some such as scala are not supported but config to get it to work can be found online.
+
 ### Undo Tree
 
 I have bundled [undotree](https://github.com/mbbill/undotree) in this repo, as it is the one plugin I would not want to
