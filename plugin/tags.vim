@@ -2,6 +2,10 @@ if executable("ctags")
 
 	if executable("fzf")
 		" Jump to tag under cursor, but if there is more than one use fzf to preview
+		let s:tagFileLoc=expand("$TMPDIR/vimtagfile")
+		let s:chosenTagLoc=expand("$TMPDIR/vimchosentag")
+		let s:fzfCmd = "fzf --with-nth 2 < " . s:tagFileLoc . " --preview 'echo {} | cut -d\" \" -f3-"
+
 		function! s:FuzzyTagPicker()
 			let l:tag = expand("<cword>")
 			let l:fileName = expand("%")
@@ -12,16 +16,32 @@ if executable("ctags")
 				execute "edit " . l:tags[0]["filename"]
 				execute "normal " . l:tags[0]["cmd"]
 			else
-				" TODO: See what the fastest way of doing this is
-				let l:tagFileLoc="$TMPDIR/vimtagfile"
-				execute "silent !rm " . l:tagFileLoc
+				execute "silent !rm " . s:tagFileLoc . " " . s:chosenTagLoc
 				let i = 0
 				let writeList = []
 				for tagMatch in l:tags
-					call add(writeList, i . " " . tagMatch["cmd"] . " " . tagMatch["filename"])
+					call add(writeList, i . " " . tagMatch["filename"] . " " . tagMatch["cmd"])
 					let i += 1
 				endfor
-				call writefile(writeList, expand(l:tagFileLoc))
+				call writefile(writeList, s:tagFileLoc)
+				let l:previewCmd = executable("bat") ? " | bat --theme=\"OneHalfDark\" --color always -p -l " . &filetype . "'" : "'"
+				execute "silent !" . s:fzfCmd . l:previewCmd . " > " . s:chosenTagLoc
+				redraw!
+				if v:shell_error
+					" Error with the shell - or just didn't pick an item
+				else
+					if filereadable(s:chosenTagLoc)
+						let contents = readfile(s:chosenTagLoc, '', 1)
+						if !empty(contents)
+							let splitString = split(contents, " ")
+							echomsg splitString[0]
+							echomsg splitString[1]
+							echomsg splitString[2]
+						endif
+					else
+						echoerr "Unable to read a valid file at ".expandedFilePath
+					endif
+				endif
 			endif
 		endfunction
 
