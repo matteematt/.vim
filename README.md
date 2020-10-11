@@ -10,6 +10,29 @@ Linux and MacOS.  I am a novice at vimscript so I imagine a lot of my scripts co
 A description of the vim plugins found in the `plugin/` directory. Keybindings are included, but note there are more
 keybindings that this, such as from the `vimrc` file.
 
+### ColJumper
+
+This command moves the insert mode cursor in line with the next non-whitespace character in any of the above lines, or
+keeps it in place if that is not possible. An example where this is useful could be to line up the cursor column in line
+with an inline comment on the above line without having to press space or tab multiple times:
+```
+Cursor position signified by "@"
+.....
+let example = "great example"               " this is a great example
+let x = 23@
+.....
+<C-j>
+NB: In this particular example <C-j> needed to be pressed multiple times as there are multiple matching patterns for the
+initial cursor position.
+.....
+let example = "great example"               " this is a great example
+let x = 23                                  @
+```
+Other examples include lining up `<-` or `=` in Haskell.
+```
+<C-j> - Jump the insert mode cursor
+```
+
 ### Comments Toggle
 
 A simple plugin to toggle a range of lines as commented or uncommented.
