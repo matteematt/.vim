@@ -1,5 +1,6 @@
 if has("syntax") && has("virtualedit")
-  " Loop through each row and tries to find a column to jump to
+  " Loop through each row and tries to find a line with a valid col to jump to
+  " Return the line number, or 0 if there is no valid line
   function! s:FindJumpRow()
     " won't find anything if already on first line
     if getcurpos()[1] == 1 | return 0 | endif
@@ -41,11 +42,17 @@ if has("syntax") && has("virtualedit")
       call s:MoveCursorTo(a:desiredCol, a:initialPosition[1])
       exec "norm i "
   endfunction
-  let JumpcursorCallback = function("s:JumpCursorCallback")
+  let JumpcursorCallbackRef = function("s:JumpCursorCallback")
 
   " For moving cursor and subsequent text in line with desired column
-   " function! s:PushCursorCallback(x, y )
-     " call s:MoveCursorTo(
+  function! s:PushCursorCallback(initialPosition, desiredCol)
+    call setpos('.', a:initialPosition)
+    let requiredWhitespaceCount = a:desiredCol - a:initialPosition[2]
+    let requiredWhitespaceCount = requiredWhitespaceCount < 0 ? 0 : requiredWhitespaceCount
+    exec "norm i" . repeat(" ", requiredWhitespaceCount)
+  endfunction
+  let PushCursorCallbackRef = function("s:PushCursorCallback")
 
-  inoremap <C-j> :call <SID>ColJumper(JumpcursorCallback)<CR>a
+  inoremap <C-j> :call <SID>ColJumper(JumpcursorCallbackRef)<CR>a
+  inoremap <C-m> :call <SID>ColJumper(PushCursorCallbackRef)<CR>wi
 endif
