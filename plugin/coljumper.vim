@@ -1,4 +1,5 @@
 if has("syntax") && has("virtualedit")
+  " Loop through each row and tries to find a column to jump to
   function! s:FindJumpRow()
     " won't find anything if already on first line
     if getcurpos()[1] == 1 | return 0 | endif
@@ -11,6 +12,7 @@ if has("syntax") && has("virtualedit")
     endwhile
   endfunction
 
+  " Move the cursor to x,y position in the current buffer
   function! s:MoveCursorTo(x, y)
     let cursorPos = getcurpos()
     let cursorPos[1] = a:y
@@ -18,8 +20,8 @@ if has("syntax") && has("virtualedit")
     call setpos('.', cursorPos)
   endfunction
 
-  " jumps the cursor in line with the next non-blank character in above lines
-  function! s:JumpCursorCol()
+  " Main function
+  function! s:ColJumper(callback)
     let initialPosition = getcurpos()
 		let initialVE = &virtualedit
     set virtualedit=all
@@ -29,11 +31,17 @@ if has("syntax") && has("virtualedit")
       call s:MoveCursorTo(initialPosition[2], candidateRow)
       call search("\\s\\ze\\S", 'z', line('.'))
       let col = getcurpos()[2]
-      call s:MoveCursorTo(col, initialPosition[1])
-      exec "norm i "
+      call a:callback(col, initialPosition[1])
     endif
     let &virtualedit=initialVE
   endfunction
 
-  inoremap <C-j> :call <SID>JumpCursorCol()<CR>a
+  " For jumping the cursor out onto RHS whitespace
+  function! s:JumpCursorCallback(x, y)
+      call s:MoveCursorTo(a:x, a:y)
+      exec "norm i "
+  endfunction
+  let JumpcursorCallback = function("s:JumpCursorCallback")
+
+  inoremap <C-j> :call <SID>ColJumper(JumpcursorCallback)<CR>a
 endif
