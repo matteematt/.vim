@@ -31,17 +31,21 @@ if has("syntax") && has("virtualedit")
       call s:MoveCursorTo(initialPosition[2], candidateRow)
       call search("\\s\\ze\\S", 'z', line('.'))
       let col = getcurpos()[2]
-      call a:callback(col, initialPosition[1])
+      call a:callback(initialPosition, col)
     endif
     let &virtualedit=initialVE
   endfunction
 
   " For jumping the cursor out onto RHS whitespace
-  function! s:JumpCursorCallback(x, y)
-      call s:MoveCursorTo(a:x, a:y)
+  function! s:JumpCursorCallback(initialPosition, desiredCol)
+      call s:MoveCursorTo(a:desiredCol, a:initialPosition[1])
       exec "norm i "
   endfunction
   let JumpcursorCallback = function("s:JumpCursorCallback")
+
+  " For moving cursor and subsequent text in line with desired column
+   " function! s:PushCursorCallback(x, y )
+     " call s:MoveCursorTo(
 
   inoremap <C-j> :call <SID>ColJumper(JumpcursorCallback)<CR>a
 endif
