@@ -3,17 +3,7 @@
 
 let s:sectionsLen = exists('g:startup_section_len') ? g:startup_section_len : 5
 
-let s:title = [
-			\ ' ___      ___  ___      _____ ______       ',
-			\ '|\  \    /  /||\  \    |\   _ \  _   \     ',
-			\ '\ \  \  /  / /\ \  \   \ \  \\\__\ \  \    ',
-			\ ' \ \  \/  / /  \ \  \   \ \  \\|__| \  \   ',
-			\ '  \ \    / /    \ \  \   \ \  \    \ \  \  ',
-			\ '   \ \__/ /      \ \__\   \ \__\    \ \__\ ',
-			\ '    \|__|/        \|__|    \|__|     \|__| ']
-
 function! s:StartupScreen()
-	call append('$', "")
 	call s:ShowTitle()
 	call append('$', "")
 	call s:ShowRecentProjectFilesBlock()
@@ -22,7 +12,16 @@ function! s:StartupScreen()
 endfunction
 
 function! s:ShowTitle()
-	for line in s:title
+	let title = [
+				\ ' ___      ___  ___      _____ ______       ',
+				\ '|\  \    /  /||\  \    |\   _ \  _   \     ',
+				\ '\ \  \  /  / /\ \  \   \ \  \\\__\ \  \    ',
+				\ ' \ \  \/  / /  \ \  \   \ \  \\|__| \  \   ',
+				\ '  \ \    / /    \ \  \   \ \  \    \ \  \  ',
+				\ '   \ \__/ /      \ \__\   \ \__\    \ \__\ ',
+				\ '    \|__|/        \|__|    \|__|     \|__| ']
+
+	for line in l:title
 		call append('$', ' ' . line)
 	endfor
 endfunction
