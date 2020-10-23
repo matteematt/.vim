@@ -1,7 +1,35 @@
+" ----------------------------------------
+" Initialise the startup buffer text contents
+
+let s:sectionsLen = 5
+
 function! s:StartupScreen()
+	call append('$', "  VIM")
 	call append('$', "")
+	call s:ShowOldfilesBlock()
 endfunction
 
+function! s:ShowOldfilesBlock()
+	if !has("viminfo") | return | endif
+	let chooseList = []
+	let i = 0
+	for item in v:oldfiles[0:s:sectionsLen-1]
+		let i += 1
+		call add(chooseList, '['.i.'] ' . item)
+	endfor
+
+	call append('$', "  ### RECENT FILES")
+	if len(chooseList) == 0
+		call append('$', "  -- No recent files to list")
+	else
+		for item in chooseList
+			call append('$', "  " . item)
+		endfor
+	endif
+endfunction
+
+" ----------------------------------------
+" Initialise the startup buffer functionality
 function! s:InitStartupBuffer()
 	" Don't run if: we have commandline arguments, we don't have an empty
 	" buffer, if we've not invoked as vim or gvim, or if we'e start in insert mode
@@ -23,6 +51,7 @@ function! s:InitStartupBuffer()
 				\ nonumber
 				\ noswapfile
 				\ norelativenumber
+				\ nospell
 
 	call s:StartupScreen()
 
