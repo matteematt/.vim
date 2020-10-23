@@ -1,12 +1,52 @@
 " ----------------------------------------
 " Initialise the startup buffer text contents
 
-let s:sectionsLen = 5
+let s:sectionsLen = exists('g:startup_section_len') ? g:startup_section_len : 5
+
+let s:title = [
+			\ ' ___      ___  ___      _____ ______       ',
+			\ '|\  \    /  /||\  \    |\   _ \  _   \     ',
+			\ '\ \  \  /  / /\ \  \   \ \  \\\__\ \  \    ',
+			\ ' \ \  \/  / /  \ \  \   \ \  \\|__| \  \   ',
+			\ '  \ \    / /    \ \  \   \ \  \    \ \  \  ',
+			\ '   \ \__/ /      \ \__\   \ \__\    \ \__\ ',
+			\ '    \|__|/        \|__|    \|__|     \|__| ']
 
 function! s:StartupScreen()
-	call append('$', "  VIM")
+	call append('$', "")
+	call s:ShowTitle()
+	call append('$', "")
+	call s:ShowRecentProjectFilesBlock()
 	call append('$', "")
 	call s:ShowOldfilesBlock()
+endfunction
+
+function! s:ShowTitle()
+	for line in s:title
+		call append('$', ' ' . line)
+	endfor
+endfunction
+
+function! s:ShowRecentProjectFilesBlock()
+	if !has("viminfo") | return | endif
+	let chooseList = []
+	let currDir = getcwd()
+	let i = 0
+	for item in v:oldfiles
+		let i += 1
+		if expand(item) =~ currDir
+			call add(chooseList, '['.i.'] ' . item)
+		endif
+	endfor
+
+	call append('$', "  ### PROJECT FILES")
+	if len(chooseList) == 0
+		call append('$', "  -- No recent files to list from this working directory")
+	else
+		for item in chooseList[0:s:sectionsLen-1]
+			call append('$', "  " . item)
+		endfor
+	endif
 endfunction
 
 function! s:ShowOldfilesBlock()
@@ -27,6 +67,8 @@ function! s:ShowOldfilesBlock()
 		endfor
 	endif
 endfunction
+
+" TODO: Add choosing previous layouts if I ever start using that functionality
 
 " ----------------------------------------
 " Initialise the startup buffer functionality
