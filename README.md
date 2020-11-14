@@ -1,3 +1,5 @@
+I have now archieved this repository as I have merged it with my main dotfiles repo which can be [found here](https://github.com/matteematt/.dotfiles/tree/master/.vim)
+
 # VIM
 
 This is my vim configuration that aims to be fairly portable and lightweight, while doing everything I personally like.
